@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Auth App',
+      title: 'Aplikasi Login',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: LoginScreen(),
     );
