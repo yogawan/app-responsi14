@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
-import 'register_screen.dart';
-import 'home_screen.dart';
-import 'api_service.dart';
+import './api_service.dart';
+import './product_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final ApiService _apiService = ApiService();
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final ApiService apiService = ApiService();
+  String errorMessage = '';
 
-  void _login() async {
+  void login() async {
+    final email = emailController.text;
+    final password = passwordController.text;
+
     try {
-      String token = await _apiService.login(
-        _emailController.text,
-        _passwordController.text,
-      );
-      Navigator.push(
+      final token = await apiService.login(email, password);
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeScreen(token: token),
+          builder: (context) => ProductPage(token: token),
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      setState(() {
+        errorMessage = e.toString();
+      });
     }
   }
 
@@ -37,32 +37,32 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller: _emailController,
+              controller: emailController,
               decoration: InputDecoration(labelText: 'Email'),
             ),
             TextField(
-              controller: _passwordController,
+              controller: passwordController,
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: _login,
+              onPressed: login,
               child: Text('Login'),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RegisterScreen()),
-                );
-              },
-              child: Text('Don\'t have an account? Register'),
-            ),
+            if (errorMessage.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Text(
+                  errorMessage,
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
           ],
         ),
       ),
